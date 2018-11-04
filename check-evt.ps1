@@ -1,4 +1,4 @@
-#under development test
+#under development
 #EventIDを2に書き換える。テストマシンでは過去24時間に発生していないので、2を指定してもエラーになるので。
 $shutdowntime = get-winevent -LogName system -errorAction:silentlycontinue -FilterXPath "*[System[(EventID=7036) and TimeCreated[timediff(@SystemTime) <= 86400000]]]"
 $lastshutdowntime = $shutdowntime.Get(0) | Select-Object Timecreated
@@ -20,11 +20,13 @@ for ($i = 0; $i -lt $errorsafterreboot.Count; $i++) {
         $ierror = ($errorsafterreboot.GetValue($i)).id
         $jerror = ($errorsbeforereboot.GetValue($j)).id
 
+        #IDが一致していれば抽出してメッセージの比較を実行
         if ($ierror -eq $jerror) {
 
             $imessage = ($errorsafterreboot.GetValue($i)).message
             $jmessage = ($errorsbeforereboot.GetValue($j)).message
 
+            #メッセージも一致していれば調査対象
             if ($imessage -eq $jmessage) {
 
                 Write-Output "Error Check" + '$ierror:'$ierror + '$imessage:'$imessage | Out-File .\test.txt -Append
